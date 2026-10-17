@@ -1,0 +1,29 @@
+{
+  "name": "douminidouman-video",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DouminiDouman — vidéo de présentation (Remotion) narrée par Doumi, la mascotte issue du logo",
+  "scripts": {
+    "studio": "remotion studio",
+    "screens": "python3 scripts/prepare_screens.py",
+    "logo": "python3 scripts/extract_logo.py",
+    "voice": "python3 scripts/generate_voice.py",
+    "sfx": "python3 scripts/generate_sfx.py",
+    "stills": "node scripts/render-stills.mjs",
+    "render": "remotion render Presentation out/douminidouman-presentation.mp4 --codec=h264 --crf=16 && bash scripts/master-audio.sh out/douminidouman-presentation.mp4",
+    "render:nuit": "remotion render PresentationNuit out/douminidouman-presentation-nuit.mp4 --codec=h264 --crf=16 && bash scripts/master-audio.sh out/douminidouman-presentation-nuit.mp4",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.529",
+    "@remotion/google-fonts": "^4.0.529",
+    "@remotion/media-utils": "^4.0.529",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "^4.0.529"
+  }
+}
