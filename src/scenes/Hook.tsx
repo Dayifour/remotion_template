@@ -1,166 +1,147 @@
 import React from "react";
-import { AbsoluteFill, Img, staticFile } from "remotion";
-import logo from "../brand/logo-paths.json";
-import { BrandLogo, IconStar, LiveDot, MaskWord } from "../components/Kit";
-import { useSceneFrame } from "../components/Scene";
-import { easeInOut, easeOut, mix, pop, progress } from "../ease";
-import { brand, displayFont, fontFamily, FPS, sceneBg } from "../theme";
-import { cueStart, wordAt } from "../timeline";
+import { AbsoluteFill, interpolate, random, useCurrentFrame } from "remotion";
+import { IconBack, IconCart } from "../components/Icons";
+import { Kinetic, StudioBg, Dust, useVertical } from "../components/Fx";
+import { Phone, Screen } from "../components/Phone";
+import { StatusBar } from "../components/App";
+import { C, font } from "../theme";
+import { bar, BEAT, easeIn, mix, pop, prog, word } from "../timing";
 
-/**
- * Séquence 1 — l'accroche, dans la manchette orange de l'accueil du site.
- * Doumi se présente, puis pose la question du soir : « On mange où ce soir ? ».
- */
-const Photo: React.FC<{ src: string; p: number; style: React.CSSProperties; rot: number; drift: number }> = ({ src, p, style, rot, drift }) => (
-  <div
-    style={{
-      position: "absolute",
-      borderRadius: 40,
-      overflow: "hidden",
-      border: "10px solid #fff7ef",
-      boxShadow: "0 40px 90px rgba(90,25,0,0.35)",
-      opacity: p,
-      transform: `translateY(${mix(p, 120, 0) - drift * 30}px) rotate(${mix(p, rot * 3, rot)}deg) scale(${mix(p, 0.9, 1)})`,
-      ...style,
-    }}
-  >
-    <Img src={staticFile(`photos/${src}.webp`)} style={{ width: "100%", height: "100%", objectFit: "cover", transform: `scale(${1.08 - drift * 0.06})` }} />
-  </div>
+/** 0 – mesure 4 : la montée du beat. On commande sur WhatsApp… puis plus rien. */
+const MSGS = [
+  { t: "Bonjour, je prends le Galaxy A55 🙏", h: "14:02", at: 0.3 },
+  { t: "Ma commande est confirmée ?", h: "15:10", at: 1.6 },
+  { t: "Allô ?", h: "17:45", at: 2.35 },
+  { t: "Elle arrive quand ?", h: "09:12", at: 2.9 },
+  { t: "???", h: "11:30", at: 3.4 },
+];
+
+const Chat: React.FC<{ f: number }> = ({ f }) => (
+  <Screen bg="#0b141a">
+    <div style={{ position: "absolute", inset: 0, opacity: 0.06, backgroundImage: "radial-gradient(#fff 1px, transparent 1.4px)", backgroundSize: "22px 22px" }} />
+    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 104, background: "#1f2c34", display: "flex", alignItems: "flex-end", gap: 12, padding: "0 16px 14px" }}>
+      <IconBack size={24} color="#fff" />
+      <div style={{ width: 42, height: 42, borderRadius: 21, background: "#37474f", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <IconCart size={21} color="#cfd8dc" />
+      </div>
+      <div>
+        <div style={{ fontSize: 18, fontWeight: 600 }}>Boutique téléphones</div>
+        <div style={{ fontSize: 13, color: "#8696a0" }}>vu hier à 14:05</div>
+      </div>
+    </div>
+    <div style={{ position: "absolute", top: 126, left: 0, right: 0, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 10, padding: "0 14px" }}>
+      {MSGS.map((m, i) => {
+        const p = pop(f, bar(m.at), 13, 220);
+        if (f < bar(m.at)) return null;
+        return (
+          <React.Fragment key={i}>
+            {i === 3 && (
+              <div style={{ alignSelf: "center", fontSize: 13, color: "#8696a0", background: "#182229", padding: "5px 12px", borderRadius: 8, opacity: p }}>Aujourd'hui</div>
+            )}
+            <div
+              style={{
+                maxWidth: 290,
+                background: "#005c4b",
+                borderRadius: "14px 4px 14px 14px",
+                padding: "9px 12px 22px",
+                fontSize: 16.5,
+                color: "#e9edef",
+                position: "relative",
+                minWidth: 110,
+                transform: `scale(${p})`,
+                transformOrigin: "100% 0",
+              }}
+            >
+              {m.t}
+              <span style={{ position: "absolute", right: 10, bottom: 5, fontSize: 12, color: "#8fb4ad", display: "flex", gap: 4, alignItems: "center" }}>
+                {m.h}
+                <svg width="18" height="11" viewBox="0 0 18 11">
+                  <path d="M1 6l3 3 6-7M7 9l1 0.5 7-8" stroke="#8fb4ad" strokeWidth="1.8" fill="none" />
+                </svg>
+              </span>
+            </div>
+          </React.Fragment>
+        );
+      })}
+    </div>
+    <StatusBar time="11:30" />
+  </Screen>
 );
 
 export const Hook: React.FC = () => {
-  const f = useSceneFrame();
-  const w = (word: string) => wordAt("hook", word);
-  const q = cueStart("hook");
-  const drift = progress(f, q, 220, easeInOut);
-  const photos = progress(f, q - 4, 26, easeOut);
-  const photos2 = progress(f, q + 4, 26, easeOut);
-  const intro = 1 - progress(f, q - 14, 14, easeInOut); // la marque s'efface quand la question arrive
-  const logoIn = progress(f, 12, 22, easeOut);
-  const card = Math.max(0, pop(f, w("ouvert") - 4, 12, 180));
-  const questions = [
-    { text: "Ouvert maintenant ?", at: w("ouvert"), x: 120, y: 650, r: -3 },
-    { text: "Quelle carte ?", at: w("restaurant"), x: 560, y: 660, r: 2.5 },
-    { text: "Combien en FCFA ?", at: w("prix"), x: 300, y: 770, r: -2 },
+  const f = useCurrentFrame();
+  const v = useVertical();
+  const end = bar(4);
+  // la caméra se rapproche du téléphone pendant toute la montée, puis tremble juste avant le drop
+  const push = prog(f, 0, end, (x) => x);
+  const shakeAmt = interpolate(f, [end - 22, end], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const sx = (random(`sx${f}`) - 0.5) * 22 * shakeAmt;
+  const sy = (random(`sy${f}`) - 0.5) * 22 * shakeAmt;
+  const suck = prog(f, end - 8, 8, easeIn);
+  const pw = v ? 560 : 370;
+
+  const t1 = [
+    { t: "Vous", at: word("hook1", "Vous") },
+    { t: "commandez", at: word("hook1", "commandez") },
+    { t: "sur", at: word("hook1", "sur") },
+    { t: "WhatsApp…", at: word("hook1", "WhatsApp"), color: C.wa },
   ];
+  const t2 = [
+    { t: "Et", at: word("hook2", "Et") },
+    { t: "puis,", at: word("hook2", "puis") },
+    { t: "plus", at: word("hook2", "plus") },
+    { t: "rien.", at: word("hook2", "rien"), color: "#ff6a2b" },
+  ];
+  const t3 = [
+    { t: "Elle", at: word("hook2", "Elle") },
+    { t: "en", at: word("hook2", "en") },
+    { t: "est", at: word("hook2", "est") },
+    { t: "où ?", at: word("hook2", "ou"), color: "#ff6a2b" },
+  ];
+  const swap = word("hook2", "Et") - 4;
+  const swap2 = word("hook2", "Elle") - 3;
+  const textSize = v ? 92 : 84;
 
   return (
-    <AbsoluteFill style={{ background: sceneBg("brand", "70% 30%"), fontFamily, overflow: "hidden" }}>
-      {/* Filigrane : le cœur du logo, à échelle monumentale et presque effacé */}
-      <svg viewBox="240 430 460 600" style={{ position: "absolute", right: -260, top: -160, width: 1300, height: 1700, opacity: 0.1 }}>
-        <path d={logo.arc.d} fill={brand.cream} />
-        <path d={logo.heart.d} fill={brand.cream} />
-      </svg>
-
-      {/* Accueil : le logo officiel au-dessus de Doumi */}
-      <div
-        style={{
-          position: "absolute",
-          left: 960,
-          top: 70,
-          transform: `translateX(-50%) translateY(${mix(logoIn, -30, 0)}px) scale(${mix(intro, 0.9, 1)})`,
-          opacity: logoIn * intro,
-          padding: "18px 34px",
-          borderRadius: 30,
-          background: brand.cream,
-          boxShadow: "0 24px 60px rgba(90,25,0,0.28)",
-        }}
-      >
-        <BrandLogo height={118} />
-      </div>
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          top: 270,
-          textAlign: "center",
-          color: brand.cream,
-          fontSize: 30,
-          fontWeight: 700,
-          letterSpacing: "0.2em",
-          textTransform: "uppercase",
-          opacity: progress(f, 30, 20, easeOut) * intro,
-        }}
-      >
-        Bamako · de la découverte à la commande
-      </div>
-
-      {/* La question du soir — le titre de l'accueil du site */}
-      <div
-        style={{
-          position: "absolute",
-          left: 120,
-          top: 250,
-          fontFamily: displayFont,
-          fontSize: 172,
-          fontWeight: 800,
-          lineHeight: 0.98,
-          letterSpacing: "-0.05em",
-          color: brand.cream,
-        }}
-      >
-        <div>
-          <MaskWord frame={f} at={w("ce")}>On</MaskWord> <MaskWord frame={f} at={w("ce") + 3}>mange</MaskWord>
-        </div>
-        <div>
-          <MaskWord frame={f} at={w("ce") + 6}>où</MaskWord> <MaskWord frame={f} at={w("ce") + 9}>ce</MaskWord>{" "}
-          <MaskWord frame={f} at={w("ce") + 12}>soir</MaskWord> <MaskWord frame={f} at={w("où")} style={{ color: brand.yellow }}>?</MaskWord>
-        </div>
-      </div>
-
-      {questions.map((qq) => {
-        const p = Math.max(0, pop(f, qq.at - 3, 10, 190));
-        const bob = Math.sin(((f - qq.at) / FPS) * Math.PI * 0.8) * 5;
-        return (
-          <div
-            key={qq.text}
-            style={{
-              position: "absolute",
-              left: qq.x,
-              top: qq.y + bob,
-              padding: "16px 28px",
-              borderRadius: 999,
-              background: brand.cream,
-              color: "#1a1410",
-              fontSize: 34,
-              fontWeight: 700,
-              boxShadow: "0 18px 40px rgba(90,25,0,0.25)",
-              transform: `rotate(${qq.r}deg) scale(${p})`,
-              transformOrigin: "left center",
-            }}
-          >
-            {qq.text}
+    <AbsoluteFill style={{ transform: `translate(${sx}px, ${sy}px) scale(${1 + suck * 0.6})`, filter: `blur(${suck * 14}px)` }}>
+      <StudioBg dark />
+      <Dust count={50} opacity={0.35} />
+      <AbsoluteFill style={{ display: "flex", alignItems: "center", flexDirection: "row", justifyContent: v ? "center" : "flex-end", paddingRight: v ? 0 : 230 }}>
+        <div style={{ transform: `translateY(${v ? 200 : 0}px) scale(${mix(push, 0.92, 1.08)}) rotate(${mix(push, -4, 2)}deg)`, perspective: 1500 }}>
+          <div style={{ transform: `rotateY(${mix(push, v ? 14 : -18, v ? -6 : -8)}deg) rotateX(${mix(push, 8, 2)}deg)` }}>
+            <Phone width={pw} glare={mix(push, 0.1, 0.7)}>
+              <Chat f={f} />
+            </Phone>
           </div>
-        );
-      })}
-
-      {/* Photos d'ambiance (Unsplash, comme sur l'accueil du site) */}
-      <Photo src="poissons-braises" p={photos} rot={3} drift={drift} style={{ left: 1290, top: 120, width: 520, height: 660 }} />
-      <Photo src="poulet-riz-au-gras" p={photos2} rot={-4} drift={drift * 1.6} style={{ left: 1150, top: 560, width: 330, height: 400 }} />
-
-      {/* Carte flottante, comme dans la manchette de l'accueil */}
+        </div>
+      </AbsoluteFill>
+      {/* « silence » : horloge qui tourne — le temps passe et personne ne répond */}
       <div
         style={{
           position: "absolute",
-          left: 1110,
-          top: 300,
-          padding: "20px 26px",
-          borderRadius: 28,
-          background: "#ffffff",
-          boxShadow: "0 24px 60px rgba(90,25,0,0.3)",
-          transform: `scale(${card}) translateY(${-drift * 14}px)`,
-          transformOrigin: "right center",
-          color: "#292622",
+          ...(v ? { left: 80, top: 440 } : { left: 140, top: 760 }),
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          fontSize: 34,
+          fontFamily: font,
+          fontWeight: 700,
+          color: "rgba(255,255,255,0.75)",
+          opacity: prog(f, bar(1.5), 10) * (1 - prog(f, end - 10, 8)),
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 21, fontWeight: 700, color: "#3f7a24" }}>
-          <LiveDot color="#3f7a24" size={11} /> Ouvert maintenant
-        </div>
-        <div style={{ fontFamily: displayFont, fontSize: 36, fontWeight: 750, marginTop: 6, letterSpacing: "-0.02em" }}>Djoliba Grill</div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6, fontSize: 21, color: "#625c55" }}>
-          <IconStar size={22} /> <b style={{ color: "#292622" }}>4,4</b> Badalabougou
-        </div>
+        <svg width="54" height="54" viewBox="0 0 54 54">
+          <circle cx="27" cy="27" r="24" stroke="rgba(255,255,255,0.6)" strokeWidth="3" fill="none" />
+          <line x1="27" y1="27" x2={27 + 15 * Math.sin(f / 3)} y2={27 - 15 * Math.cos(f / 3)} stroke="#ff6a2b" strokeWidth="3.5" strokeLinecap="round" />
+          <line x1="27" y1="27" x2={27 + 10 * Math.sin(f / 36)} y2={27 - 10 * Math.cos(f / 36)} stroke="#fff" strokeWidth="3.5" strokeLinecap="round" />
+        </svg>
+        {f < bar(2.9) ? "pas de réponse" : "toujours rien"}
+      </div>
+      <div style={{ position: "absolute", ...(v ? { left: 80, right: 80, top: 190 } : { left: 140, width: 820, top: 300 }) }}>
+        {f < swap && <Kinetic words={t1} size={textSize} color="#fff" align="left" />}
+        {f >= swap && f < swap2 && <Kinetic words={t2} size={textSize * 1.12} color="#fff" align="left" />}
+        {f >= swap2 && <Kinetic words={t3} size={textSize * 1.12} color="#fff" align="left" />}
+        <div style={{ height: 1, marginTop: 20, width: mix(prog(f, 0, BEAT * 8), 0, 220), background: "rgba(255,255,255,0.3)" }} />
       </div>
     </AbsoluteFill>
   );

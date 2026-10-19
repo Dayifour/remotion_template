@@ -1,75 +1,31 @@
 {
-  "title": "DouminiDouman — vidéo de présentation (Doumi, la mascotte, en narrateur)",
-  "language": "fr-FR",
-  "register": "vouvoiement",
-  "narrator": "Doumi, le cœur à toque du logo DouminiDouman, parle à la première personne",
-  "tone": "chaleureux, gourmand, simple ; moderne mais accessible ; ancré à Bamako",
+  "title": "Yelen Sugu — vidéo de démonstration (voix off féminine calée sur le beat)",
   "voice": "fr-FR-VivienneMultilingualNeural",
-  "rate": "+6%",
-  "pitch": "+0Hz",
+  "rate": "+2%",
+  "pitch": "-3Hz",
+  "music": {
+    "file": "ressources/WhatsApp Audio 2026-10-19 at 4.22.01 PM.mpeg",
+    "offset": 9.218,
+    "bpm": 136,
+    "note": "t=0 de la vidéo = 9,218 s du beat (une mesure de la montée) ; le drop tombe à la mesure 4 de la vidéo"
+  },
   "lines": [
-    {
-      "id": "intro",
-      "section": "hook",
-      "text": "Bonjour ! Moi, c'est Doumi, de DouminiDouman.",
-      "tts": "Bonjour ! Moi, c'est Doumi, de Doumini Douman."
-    },
-    {
-      "id": "hook",
-      "section": "hook",
-      "text": "Ce soir, on mange où ? Quel restaurant est ouvert, et à quel prix ?"
-    },
-    {
-      "id": "discover",
-      "section": "discover",
-      "text": "DouminiDouman vous montre les restaurants ouverts autour de vous, à Bamako, avec leur carte et leurs prix en francs CFA.",
-      "tts": "Doumini Douman vous montre les restaurants ouverts autour de vous, à Bamako, avec leur carte et leurs prix en francs CFA."
-    },
-    {
-      "id": "menu",
-      "section": "menu",
-      "text": "Chaque restaurant a sa propre page : ses photos, ses plats, ses horaires, et les avis de ses clients."
-    },
-    {
-      "id": "order1",
-      "section": "order",
-      "text": "À table, on scanne le QR code, on choisit ses plats… et on commande."
-    },
-    {
-      "id": "order2",
-      "section": "order",
-      "text": "Sans compte, sans application à installer. Et on paie en espèces, au restaurant."
-    },
-    {
-      "id": "tracking",
-      "section": "tracking",
-      "text": "Le suivi de la commande se met à jour en direct, jusqu'à l'assiette."
-    },
-    {
-      "id": "kitchen",
-      "section": "kitchen",
-      "text": "Côté restaurant, chaque commande arrive en temps réel, avec une notification. L'équipe la fait avancer en un geste."
-    },
-    {
-      "id": "manage",
-      "section": "manage",
-      "text": "Le propriétaire choisit l'apparence de sa page, imprime ses QR codes par table, et invite ses managers."
-    },
-    {
-      "id": "pilot",
-      "section": "pilot",
-      "text": "Il suit ses ventes, ses meilleurs plats et sa visibilité… et gère plusieurs établissements depuis un seul compte."
-    },
-    {
-      "id": "closing",
-      "section": "closing",
-      "text": "Résultat : des restaurants plus visibles, un service plus rapide, et des clients qui reviennent."
-    },
-    {
-      "id": "cta",
-      "section": "cta",
-      "text": "DouminiDouman : les restaurants de Bamako, de la découverte à la commande. Rendez-vous sur douminidouman.cloud !",
-      "tts": "Doumini Douman : les restaurants de Bamako, de la découverte à la commande. Rendez-vous sur doumini douman point cloud !"
-    }
-  ]
+    { "id": "hook1", "bar": 0.25, "text": "Vous commandez sur WhatsApp…" },
+    { "id": "hook2", "bar": 2, "text": "Et puis, plus rien. Elle en est où, votre commande ?" },
+    { "id": "reveal", "bar": 4.5, "text": "Avec Yelen Sugu, vous savez.", "tts": "Avec Yélèn Sougou, vous savez." },
+    { "id": "web", "bar": 6.25, "text": "Smartphones, ordinateurs, audio, accessoires… tout ce qu'il vous faut, livré à Bamako." },
+    { "id": "shop", "bar": 10.25, "text": "Vous choisissez, vous ajoutez au panier. Le prix affiché est le prix payé." },
+    { "id": "cart", "bar": 14.25, "text": "Et la livraison est gratuite, partout à Bamako, sans minimum d'achat." },
+    { "id": "whatsapp", "bar": 18.25, "text": "Puis vous commandez comme d'habitude, sur WhatsApp : votre numéro de commande est déjà dans le message." },
+    { "id": "confirm", "bar": 22.75, "text": "L'équipe confirme… et vous êtes prévenu, directement sur votre téléphone." },
+    { "id": "step1", "bar": 28, "text": "En attente." },
+    { "id": "step2", "bar": 29, "text": "Confirmée." },
+    { "id": "step3", "bar": 30, "text": "En préparation." },
+    { "id": "step4", "bar": 31, "text": "En route." },
+    { "id": "step5", "bar": 32, "text": "Livrée !" },
+    { "id": "track", "bar": 33.25, "text": "Chaque étape est datée : vous savez toujours où en est votre commande." },
+    { "id": "pay", "bar": 37.25, "text": "Vous payez à la livraison, ou par Orange Money et Wave.", "tts": "Vous payez à la livraison, ou par Orange Money et Ouève." },
+    { "id": "cta", "bar": 40.5, "text": "Yelen Sugu. Sur yelen-sugu.com, et sur l'application Android.", "tts": "Yélèn Sougou. Sur yélèn-sougou point com, et sur l'application Android." }
+  ],
+  "end_bar": 45
 }

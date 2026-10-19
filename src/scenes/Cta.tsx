@@ -1,155 +1,84 @@
 import React from "react";
-import { AbsoluteFill, staticFile } from "remotion";
-import logo from "../brand/logo-paths.json";
-import { Hat } from "../components/Doumi";
-import { IconNav, MaskWord } from "../components/Kit";
-import { useSceneFrame } from "../components/Scene";
-import { easeInOut, easeOut, mix, pop, progress } from "../ease";
-import { brand, colors, displayFont, fontFamily, sceneBg } from "../theme";
-import { wordAt } from "../timeline";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { Dust, useVertical } from "../components/Fx";
+import { IconBike, IconCart, IconPhone, IconWhatsApp } from "../components/Icons";
+import { C, DEMO, font } from "../theme";
+import { bar, DURATION, easeInOut, mix, pop, prog, word } from "../timing";
+import { OrangeBg } from "./Reveal";
 
-/**
- * Séquence 10 — le logo se reconstitue à partir de ses tracés officiels
- * (cœur, arc, virgule, toque, lettrage), puis la signature du site.
- */
-export const CTA_CENTER = { x: 860, y: 400 };
-const VIEW = { x: 240, y: 430, w: 1040, h: 600 };
-const LOGO_W = 1000;
-const LOGO_H = (LOGO_W * VIEW.h) / VIEW.w;
+/** Mesure 40 → fin : logo sur fond orange, adresse du site, téléphone de la boutique. */
+export const CTA_EVENTS = () => ({ logo: bar(40) + 2, site: word("cta", "Sur"), app: word("cta", "application") });
 
-export const Cta: React.FC<{ ctaLabel: string; url: string }> = ({ ctaLabel, url }) => {
-  const f = useSceneFrame();
-  const w = (word: string, nth = 0) => wordAt("cta", word, nth);
-
-  const heart = Math.max(0, pop(f, 2, 12, 150));
-  const arc = progress(f, 8, 16, easeOut);
-  const swoosh = progress(f, 14, 18, easeInOut);
-  const hatDrop = pop(f, 20, 9, 170);
-  const text = progress(f, w("Doumini") - 4, 20, easeInOut);
-  const breathe = progress(f, 30, 240, easeInOut);
-  const pills = progress(f, w("Rendez") - 4, 18, easeOut);
-  const sign: { t: string; at: number; accent?: boolean }[][] = [
-    [
-      { t: "Les", at: w("les") },
-      { t: "restaurants", at: w("restaurants") },
-      { t: "de", at: w("de", 0) },
-      { t: "Bamako,", at: w("Bamako") },
-    ],
-    [
-      { t: "de", at: w("de", 1) },
-      { t: "la", at: w("la", 0) },
-      { t: "découverte", at: w("découverte") },
-      { t: "à", at: w("à") },
-      { t: "la", at: w("la", 1) },
-      { t: "commande.", at: w("commande"), accent: true },
-    ],
-  ];
-
+export const Cta: React.FC = () => {
+  const f = useCurrentFrame();
+  const v = useVertical();
+  const ev = CTA_EVENTS();
+  const badge = pop(f, ev.logo, 10, 140);
+  const site = pop(f, ev.site, 11, 170);
+  const app = pop(f, ev.app - 2, 11, 170);
+  const phone = pop(f, ev.app + 14, 11, 170);
+  const promise = prog(f, bar(43), 20);
+  const drift = prog(f, bar(40), DURATION - bar(40), (x) => x);
+  const fadeOut = prog(f, DURATION - 24, 24, easeInOut);
+  const k = v ? 1 : 0.82;
+  const chip = (p: number, children: React.ReactNode, bg: string, fg: string, big = false): React.ReactNode => (
+    <div
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 16 * k,
+        padding: `${(big ? 24 : 18) * k}px ${(big ? 40 : 30) * k}px`,
+        borderRadius: 60,
+        background: bg,
+        color: fg,
+        fontSize: (big ? 64 : 40) * k,
+        fontWeight: big ? 900 : 700,
+        letterSpacing: big ? -2 : 0,
+        transform: `scale(${p}) translateY(${mix(p, 40, 0)}px)`,
+        opacity: Math.min(1, p * 2),
+        boxShadow: big ? "0 30px 70px rgba(120,20,0,0.35)" : "none",
+      }}
+    >
+      {children}
+    </div>
+  );
   return (
-    <AbsoluteFill style={{ background: sceneBg("light", `${CTA_CENTER.x}px ${CTA_CENTER.y}px`), fontFamily }}>
-      {/* le logo, reconstitué */}
-      <svg
-        viewBox={`${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}`}
-        width={LOGO_W}
-        height={LOGO_H}
-        style={{ position: "absolute", left: CTA_CENTER.x - LOGO_W / 2, top: 90, overflow: "visible", transform: `scale(${mix(breathe, 1, 1.03)})` }}
-      >
-        <defs>
-          <clipPath id="cta-swoosh">
-            <rect x={540} y={880} width={mix(swoosh, 0, 460)} height={140} />
-          </clipPath>
-          <clipPath id="cta-text">
-            <rect x={400} y={640} width={mix(text, 0, 900)} height={280} />
-          </clipPath>
-        </defs>
-        <g transform={`translate(467 830) scale(${heart}) translate(-467 -830)`}>
-          <path d={logo.heart.d} fill={brand.yellow} />
-        </g>
-        <g opacity={arc} transform={`rotate(${mix(arc, -24, 0)} 460 820)`}>
-          <path d={logo.arc.d} fill={brand.orange} />
-        </g>
-        <path d={logo.swoosh.d} fill={brand.orange} clipPath="url(#cta-swoosh)" />
-        <g transform={`translate(0 ${(1 - hatDrop) * -380}) rotate(${(1 - hatDrop) * -25} 430 612)`} opacity={f >= 20 ? 1 : 0}>
-          <Hat />
-        </g>
-        <image href={staticFile("brand/logo-text.png")} x={0} y={0} width={1500} height={1500} clipPath="url(#cta-text)" />
-      </svg>
-
-      {/* signature du site */}
-      <div
-        style={{
-          position: "absolute",
-          left: CTA_CENTER.x - 640,
-          width: 1280,
-          top: 90 + LOGO_H + 10,
-          textAlign: "center",
-          fontFamily: displayFont,
-          fontSize: 54,
-          fontWeight: 700,
-          letterSpacing: "-0.03em",
-          lineHeight: 1.18,
-          color: colors.ink,
-        }}
-      >
-        {sign.map((line, i) => (
-          <div key={i}>
-            {line.map((word, j) => (
-              <React.Fragment key={j}>
-                <MaskWord frame={f} at={word.at} style={{ color: word.accent ? colors.brand : undefined }}>
-                  {word.t}
-                </MaskWord>{" "}
-              </React.Fragment>
-            ))}
-          </div>
-        ))}
-      </div>
-
-      {/* rendez-vous */}
-      <div
-        style={{
-          position: "absolute",
-          left: CTA_CENTER.x,
-          top: 90 + LOGO_H + 180,
-          transform: `translateX(-50%) translateY(${mix(pills, 24, 0)}px)`,
-          opacity: pills,
-          display: "flex",
-          gap: 18,
-          alignItems: "center",
-          whiteSpace: "nowrap",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 14,
-            padding: "18px 34px",
-            borderRadius: 999,
-            background: colors.brand,
-            color: "#ffffff",
-            fontSize: 34,
-            fontWeight: 800,
-            boxShadow: "0 20px 44px rgba(255,75,0,0.35)",
-          }}
-        >
-          <IconNav size={30} color="#ffffff" /> {url}
-        </div>
-        {ctaLabel && (
+    <AbsoluteFill style={{ opacity: 1 - fadeOut }}>
+      <OrangeBg f={f} />
+      <Dust count={50} opacity={0.5} />
+      <AbsoluteFill style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: font, color: "#fff", gap: 0, transform: `scale(${mix(drift, 1, 1.05)})` }}>
+        <div style={{ display: "flex", flexDirection: v ? "column" : "row", alignItems: "center", gap: 40 * k }}>
           <div
             style={{
-              padding: "18px 30px",
-              borderRadius: 999,
-              border: `2px solid ${colors.ink}`,
-              color: colors.ink,
-              fontSize: 28,
-              fontWeight: 700,
-              opacity: progress(f, w("Rendez") + 8, 16, easeOut),
+              width: 200 * k,
+              height: 200 * k,
+              borderRadius: 56 * k,
+              background: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transform: `scale(${badge}) rotate(${mix(badge, 30, 0)}deg)`,
+              boxShadow: "0 40px 90px rgba(120,20,0,0.35)",
             }}
           >
-            {ctaLabel} →
+            <IconCart size={124 * k} color={C.brand} stroke={2.2} />
           </div>
-        )}
-      </div>
+          <div style={{ fontSize: 140 * k, fontWeight: 800, letterSpacing: -5, lineHeight: 1, opacity: prog(f, ev.logo + 4, 12), transform: `translateY(${mix(prog(f, ev.logo + 4, 16), 40, 0)}px)` }}>
+            Yelen <span style={{ fontWeight: 400 }}>Sugu</span>
+          </div>
+        </div>
+        <div style={{ marginTop: 70 * k, display: "flex", flexDirection: "column", alignItems: "center", gap: 26 * k }}>
+          {chip(site, <span style={{ color: C.brand }}>{DEMO.site}</span>, "#fff", C.brand, true)}
+          <div style={{ display: "flex", gap: 20 * k, flexWrap: "wrap", justifyContent: "center" }}>
+            {chip(app, <><IconPhone size={44 * k} color="#fff" stroke={2} /> Application Android</>, "rgba(255,255,255,0.16)", "#fff")}
+            {chip(phone, <><IconWhatsApp size={44 * k} color="#fff" /> {DEMO.shopPhone}</>, "rgba(255,255,255,0.16)", "#fff")}
+          </div>
+        </div>
+        <div style={{ marginTop: 60 * k, display: "flex", alignItems: "center", gap: 14, fontSize: 34 * k, fontWeight: 600, opacity: promise * 0.95, transform: `translateY(${mix(promise, 20, 0)}px)` }}>
+          <IconBike size={38 * k} color="#fff" stroke={2} /> Livraison gratuite partout à Bamako
+        </div>
+        <div style={{ marginTop: 18 * k, fontSize: 30 * k, fontStyle: "italic", fontWeight: 500, opacity: promise * 0.8 }}>« Nous sommes prêts à la négociation »</div>
+      </AbsoluteFill>
     </AbsoluteFill>
   );
 };
