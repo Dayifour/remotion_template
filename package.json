@@ -1,17 +1,17 @@
 {
-  "name": "douminidouman-video",
+  "name": "yelen-sugu-video",
   "version": "1.0.0",
   "private": true,
-  "description": "DouminiDouman — vidéo de présentation (Remotion) narrée par Doumi, la mascotte issue du logo",
+  "description": "Yelen Sugu — vidéo de démonstration (Remotion), voix off féminine calée sur le beat",
   "scripts": {
     "studio": "remotion studio",
-    "screens": "python3 scripts/prepare_screens.py",
-    "logo": "python3 scripts/extract_logo.py",
-    "voice": "python3 scripts/generate_voice.py",
-    "sfx": "python3 scripts/generate_sfx.py",
+    "audio": "python scripts/build_audio.py",
+    "assets": "python scripts/prepare_assets.py && python scripts/generate_sfx_extra.py",
     "stills": "node scripts/render-stills.mjs",
-    "render": "remotion render Presentation out/douminidouman-presentation.mp4 --codec=h264 --crf=16 && bash scripts/master-audio.sh out/douminidouman-presentation.mp4",
-    "render:nuit": "remotion render PresentationNuit out/douminidouman-presentation-nuit.mp4 --codec=h264 --crf=16 && bash scripts/master-audio.sh out/douminidouman-presentation-nuit.mp4",
+    "render:9x16": "remotion render YelenSugu out/yelen-sugu-9x16.mp4 --codec=h264 --crf=17 --audio-bitrate=256k && node scripts/finish.mjs master out/yelen-sugu-9x16.mp4",
+    "render:16x9": "remotion render YelenSugu16x9 out/yelen-sugu-16x9.mp4 --codec=h264 --crf=17 --audio-bitrate=256k && node scripts/finish.mjs master out/yelen-sugu-16x9.mp4 && node scripts/finish.mjs srt",
+    "render:short": "node scripts/finish.mjs short",
+    "render": "npm run render:9x16 && npm run render:16x9 && npm run render:short",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
